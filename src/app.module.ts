@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import * as Joi from 'joi';
 import { ConfigModule } from '@nestjs/config';
+import { DatabaseModule } from './database/database.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ConfigModule } from '@nestjs/config';
         VERSION: Joi.string().required().default(''),
       }),
     }),
+    DatabaseModule,
   ],
   controllers: [AppController],
   providers: [AppService],
