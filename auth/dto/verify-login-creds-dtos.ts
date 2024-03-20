@@ -38,7 +38,7 @@ class VerifyLoginCredsResponseDto {
   isSignUp: boolean;
 
   constructor(user: User) {
-    this.user = user.toJSON();
+    this.user = user;
   }
 
   setAuthToken(authToken: string): VerifyLoginCredsResponseDto {

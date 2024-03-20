@@ -12,7 +12,7 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User) private readonly UserModel: typeof User) {}
+  constructor(@InjectModel(User) private readonly userModel: typeof User) {}
 
   public async createMinimalUser(
     userExists: User,
@@ -23,7 +23,7 @@ export class UserService {
     } else {
       const hashedPassword = await bcrypt.hash(registerDto.password, 10);
 
-      userExists = await this.UserModel.create({
+      userExists = await this.userModel.create({
         name: registerDto.name,
         email: registerDto.email,
         password: hashedPassword,
@@ -36,11 +36,11 @@ export class UserService {
   }
 
   public async getById(id: number): Promise<User> {
-    return this.UserModel.findOne({ where: { id } });
+    return this.userModel.findOne({ where: { id } });
   }
 
   public async findOneByEmail(email: string): Promise<User> {
-    return this.UserModel.findOne({ where: { email } });
+    return this.userModel.findOne({ where: { email } });
   }
 
   public async findUserById(userId: number): Promise<User> {
@@ -48,7 +48,7 @@ export class UserService {
       throw new BadRequestException(
         toErrorMessage(ImErrorCodes.BAD_REQUEST, ' No userID provided'),
       );
-    const findUser: User = await this.UserModel.findOne({
+    const findUser: User = await this.userModel.findOne({
       where: {
         id: userId,
       },
@@ -64,10 +64,10 @@ export class UserService {
   public async deleteUser(userId: number): Promise<User> {
     // if (isEmpty(userId)) throw new HttpException(400, "You're not userId");
 
-    const findUser: User = await this.UserModel.findByPk(userId);
+    const findUser: User = await this.userModel.findByPk(userId);
     // if (!findUser) throw new HttpException(409, "You're not user");
 
-    await this.UserModel.destroy({ where: { id: userId } });
+    await this.userModel.destroy({ where: { id: userId } });
 
     return findUser;
   }
