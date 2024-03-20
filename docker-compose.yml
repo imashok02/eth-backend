@@ -14,7 +14,7 @@ services:
             - ./:/app
             - /app/node_modules
         restart: 'unless-stopped'
-        entrypoint: [ "/app/wait-for.sh", "postgres:5432", "--", "sh", "-c", "node_modules/.bin/sequelize-cli db:migrate --config=/etc/secrets/db-config.json --migrations-path=src/migrations && npm run start:dev"]
+        entrypoint: [ "/app/wait-for.sh", "postgres:5432", "--", "sh", "-c", "node_modules/.bin/sequelize-cli db:migrate --env=test --config=/etc/secrets/db-config.json --migrations-path=src/migrations && npm run start:dev"]
         networks:
             - eth-network
         depends_on:
