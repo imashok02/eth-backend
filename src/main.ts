@@ -14,7 +14,7 @@ async function bootstrap() {
 
   await app.listen(config.get<string>('PORT'), '0.0.0.0').then((server) => {
     console.log(
-      `Nice start. We are flying 🚀 Server listening info : [Env: ${config.get<string>('NODE_ENV')}] [Port: ${config.get<string>('PORT')}]`,
+      `Nice start. We are flying 🚀 Server listening  info : [Env: ${config.get<string>('NODE_ENV')}] [Port: ${config.get<string>('PORT')}]`,
     );
     server.keepAliveTimeout = 60 * 1000; // 60s
 

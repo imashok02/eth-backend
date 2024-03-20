@@ -1,0 +1,39 @@
+version: '3.7'
+
+services:
+    server:
+        build:
+            context: ./
+            dockerfile: Dockerfile
+        container_name: server
+        env_file:
+            - .env
+        ports:
+            - '4000:4000'
+        volumes:
+            - ./:/app
+            - /app/node_modules
+        restart: 'unless-stopped'
+        entrypoint: [ "/app/wait-for.sh", "postgres:5432", "--", "sh", "-c", "node_modules/.bin/sequelize-cli db:migrate --config=/etc/secrets/db-config.json --migrations-path=src/migrations && npm run start:dev"]
+        networks:
+            - eth-network
+        depends_on:
+            - postgres
+
+    postgres:
+        image: 'bitnami/postgresql:latest'
+        env_file:
+            - database.env
+        ports:
+            - '5432:5432'
+        networks:
+            - eth-network
+        container_name: 'postgresql'
+
+networks:
+    eth-network:
+        driver: bridge
+
+volumes:
+    data:
+        driver: local
