@@ -13,6 +13,20 @@ class UserProfileDto {
   email: string;
 }
 
+class UpdateUserDto {
+  @ApiProperty()
+  name: string;
+
+  @ApiProperty()
+  email: string;
+
+  @ApiProperty()
+  address: string;
+
+  @ApiProperty()
+  privateKey: string;
+}
+
 const toUserProfileDto = (user: User): UserProfileDto => {
   return {
     id: user.id,
@@ -21,4 +35,4 @@ const toUserProfileDto = (user: User): UserProfileDto => {
   };
 };
 
-export { UserProfileDto, toUserProfileDto };
+export { UserProfileDto, toUserProfileDto, UpdateUserDto };

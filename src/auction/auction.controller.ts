@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 import { AuctionService } from './auction.service';
@@ -12,6 +12,9 @@ import {
   AuctionStatusDto,
   BidDto,
 } from './dto/auction-response-dto';
+import { CurrentUser } from 'src/common/decorator/current-user.decorator';
+import { User } from 'src/user/models/user.model';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @ApiTags('Auction')
 @Controller('auction')
@@ -68,12 +71,27 @@ export class AuctionController {
   }
 
   @Get('history')
-  async auctionHistory() {
-    return this.auctionService.auctionHistory();
+  async auctionHistory(@Query() paginationDto: PaginationDto) {
+    return this.auctionService.auctionHistory(paginationDto);
   }
 
   @Post('bid')
-  async bid(@Body() bidDto: BidDto) {
-    return this.auctionService.bid(bidDto);
+  @UseGuards(JwtAuthGuard)
+  async bid(@CurrentUser() user: User, @Body() bidDto: BidDto) {
+    return this.auctionService.bid(user, bidDto);
+  }
+
+  @Get('balance')
+  async getBalance() {
+    return this.auctionService.getBalance();
+  }
+
+  @Get('my-balance')
+  @UseGuards(JwtAuthGuard)
+  async getMyBalance(
+    @CurrentUser() user: User,
+    @Query('address') address: string,
+  ) {
+    return this.auctionService.getMyBalance(user, address);
   }
 }

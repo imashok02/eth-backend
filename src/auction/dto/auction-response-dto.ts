@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { AuctionStatus } from '../enum/auction-status.enum';
 import { IsNotEmpty, IsNumber } from 'class-validator';
 
-class AuctionStatsDto {
+class AuctionStatusDto {
   @ApiProperty()
   beneficiary: string;
 
@@ -14,11 +14,17 @@ class AuctionStatsDto {
 
   @ApiProperty()
   auctionEndTime: string;
-}
 
-class AuctionStatusDto {
   @ApiProperty()
   status: AuctionStatus;
+}
+
+class AuctionStatsDto {
+  @ApiProperty()
+  totalBids: string;
+
+  @ApiProperty()
+  totalEthVolume: string;
 }
 
 class AuctionEndTimeDto {
