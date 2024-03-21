@@ -1,8 +1,17 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
 import { AuctionService } from './auction.service';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import {
+  AuctionBeneficiary,
+  AuctionEndTimeDto,
+  AuctionHighestBid,
+  AuctionHighestBidder,
+  AuctionStatsDto,
+  AuctionStatusDto,
+  BidDto,
+} from './dto/auction-response-dto';
 
 @ApiTags('Auction')
 @Controller('auction')
@@ -12,11 +21,6 @@ export class AuctionController {
   @Get('me')
   @UseGuards(JwtAuthGuard)
   async getMe() {
-    // const auctionData = await this.auctionService.getProfile(Auction);
-    // if (AuctionData.email === null && AuctionData.name === null) {
-    //   throw new UnauthorizedException('Please enter your details.');
-    // }
-
     return {
       id: 1,
       name: 'ss',
@@ -25,7 +29,7 @@ export class AuctionController {
   }
 
   @Get('beneficiary')
-  async auction() {
+  async auction(): Promise<AuctionBeneficiary> {
     return this.auctionService.getBeneficiary();
   }
 
@@ -35,33 +39,41 @@ export class AuctionController {
   }
 
   @Get('highest-bid')
-  async getHighestBid() {
+  async getHighestBid(): Promise<AuctionHighestBid> {
     return this.auctionService.getHighestBid();
   }
 
   @Get('highest-bidder')
-  async getHighestBidder() {
+  async getHighestBidder(): Promise<AuctionHighestBidder> {
     return this.auctionService.getHighestBidder();
   }
 
   @Get('end-time')
-  async getAuctionEndTime() {
+  async getAuctionEndTime(): Promise<AuctionEndTimeDto> {
     return this.auctionService.getAuctionEndTime();
   }
 
   @Get('status')
-  async auctionStatus() {
+  @ApiOkResponse({
+    description: 'To know the status of the auction',
+    type: AuctionStatusDto,
+  })
+  async auctionStatus(): Promise<AuctionStatusDto> {
     return this.auctionService.auctionStatus();
   }
 
   @Get('stats')
-  async auctionStats() {
+  async auctionStats(): Promise<AuctionStatsDto> {
     return this.auctionService.auctionStats();
   }
 
   @Get('history')
   async auctionHistory() {
-    // TODO: store bids on the db, to show logs since contract does not have a map
     return this.auctionService.auctionHistory();
+  }
+
+  @Post('bid')
+  async bid(@Body() bidDto: BidDto) {
+    return this.auctionService.bid(bidDto);
   }
 }
