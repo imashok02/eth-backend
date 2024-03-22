@@ -12,10 +12,22 @@
 ```bash
 unzip secrets_example folder
 
+- Copy all 2 files and the config folder to the root of the project.
+- Rename config/database.json.example to config/database.json
+- Rename database.env.example to database.env
+- Rename env.example to .env
+
 1. Make sure .env and database.env is in the root of the project. - Used for secrets for app and database
 2. Make sure you have config folder in the root and there is a json file inside that named database.json
    - Used for Database migrations. This project used sequelize_migrations 
 
+```
+
+## Keys Example
+
+```bash
+1. When running the app using docker compose, DO NOT change DB_HOST in config/database.json, since app runs via docker needs it to be postgres.
+2. Also DO NOT change the value of host in test object in config/database.json, 
 
 ```
 
