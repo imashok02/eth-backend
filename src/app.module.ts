@@ -5,7 +5,7 @@ import * as Joi from 'joi';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';
 import { UserModule } from './user/user.module';
-import { AuthModule } from 'auth/auth.module';
+import { AuthModule } from 'src/auth/auth.module';
 import { AuctionModule } from './auction/auction.module';
 
 @Module({

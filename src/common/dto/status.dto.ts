@@ -1,14 +1,14 @@
 enum Status {
-  SUCCESS = "SUCCESS",
-  FAILURE = "FAILURE",
+  SUCCESS = 'SUCCESS',
+  FAILURE = 'FAILURE',
 }
 
 class ResponseDto {
   status: Status;
 
-  message?: string = "";
+  message?: string = '';
 
-  error?: string = "";
+  error?: string = '';
 
   setStatus(status: Status): ResponseDto {
     this.status = status;

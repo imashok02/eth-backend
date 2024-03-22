@@ -1,7 +1,7 @@
 export class JWTPayload {
-  constructor(sub: number) {
+  constructor(sub: string) {
     this.sub = sub;
   }
 
-  sub: number;
+  sub: string;
 }

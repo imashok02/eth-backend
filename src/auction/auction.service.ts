@@ -1,11 +1,8 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ethers } from 'ethers';
 import { DateTime } from 'luxon';
 import {
+  AuctionBalanceDto,
   AuctionBeneficiary,
   AuctionEndTimeDto,
   AuctionHighestBid,
@@ -24,28 +21,38 @@ import { User } from 'src/user/models/user.model';
 import { InjectModel } from '@nestjs/sequelize';
 import { Bid } from './models/bid.model';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { ENVIRONMENT } from 'src/common/constants';
 
 @Injectable()
 export class AuctionService {
-  provider = new ethers.InfuraProvider(
-    {
-      name: process.env.NETWORK_NAME,
-      chainId: parseInt(process.env.CHAIN_ID, 10),
-    },
-    process.env.INFURA_PROJECT_ID,
-    process.env.INFURA_PROJECT_SECRET,
-  );
-
-  contract = new ethers.Contract(
-    process.env.AUCTION_CONTRACT_ADDRESS,
-    c.abi,
-    this.provider,
-  );
+  provider;
+  contract;
 
   constructor(
     @InjectModel(User) private readonly userModel: typeof User,
     @InjectModel(Bid) private readonly bidModel: typeof Bid,
   ) {
+    if (process.env.NODE_ENV === ENVIRONMENT.DEV) {
+      this.provider = new ethers.JsonRpcProvider(
+        process.env.LOCAL_NODE_PROVIDER_URL,
+      );
+    } else {
+      this.provider = new ethers.InfuraProvider(
+        {
+          name: process.env.NETWORK_NAME,
+          chainId: parseInt(process.env.CHAIN_ID, 10),
+        },
+        process.env.INFURA_PROJECT_ID,
+        process.env.INFURA_PROJECT_SECRET,
+      );
+    }
+
+    this.contract = new ethers.Contract(
+      process.env.AUCTION_CONTRACT_ADDRESS,
+      c.abi,
+      this.provider,
+    );
+
     try {
       this.contract.on(
         'HighestBidIncreased',
@@ -63,6 +70,7 @@ export class AuctionService {
   }
 
   private async makeBidEntry(bidder: string, bidAmount: string): Promise<void> {
+    log('incoming ==> ', bidder, bidAmount);
     try {
       await this.bidModel.create({
         contract_address: process.env.AUCTION_CONTRACT_ADDRESS,
@@ -111,19 +119,33 @@ export class AuctionService {
   }
 
   public async auctionStats(): Promise<AuctionStatsDto> {
+    const balance = await this.provider.getBalance(
+      process.env.AUCTION_CONTRACT_ADDRESS,
+    );
+
+    const bidCount = await this.bidModel.count();
+
     return {
-      totalBids: '',
-      totalEthVolume: '',
+      totalBids: bidCount?.toString(),
+      totalEthVolume: ethers.formatEther(balance),
     };
   }
 
+  public async auctionBalance(): Promise<AuctionBalanceDto> {
+    return this.provider.getBalance(process.env.AUCTION_CONTRACT_ADDRESS);
+  }
+
   public async auctionStatus(): Promise<AuctionStatusDto> {
-    const auctionEndTime = await this.contract.auctionEndTime();
-    const highestBidder = await this.contract.highestBidder();
-    const highestBid = await this.contract.highestBid();
-    const beneficiary = await this.contract.beneficiary();
+    const [auctionEndTime, highestBidder, highestBid, beneficiary] =
+      await Promise.all([
+        this.contract.auctionEndTime(),
+        this.contract.highestBidder(),
+        this.contract.highestBid(),
+        this.contract.beneficiary(),
+      ]);
 
     return {
+      contractAddress: process.env.AUCTION_CONTRACT_ADDRESS,
       auctionEndTime: DateTime.fromSeconds(
         ethers.getNumber(auctionEndTime),
       ).toLocaleString(DateTime.DATETIME_MED),
@@ -146,6 +168,7 @@ export class AuctionService {
     const history = await this.bidModel.findAll({
       limit,
       offset: offset || 0,
+      order: [['createdAt', 'desc']],
     });
 
     return {
@@ -154,55 +177,50 @@ export class AuctionService {
   }
 
   public async bid(user: User, bidInfo: BidDto): Promise<BidResponseDto> {
-    const userWallet = await this.userModel.findOne({
-      where: {
-        id: user?.id,
-      },
-      attributes: ['privateKey'],
-    });
+    console.log('user: User, bidInfo: BidDto ==> ', user, bidInfo);
 
-    if (!userWallet.privateKey) {
-      throw new InternalServerErrorException(
-        toErrorMessage(
-          ImErrorCodes.INTERNAL_SERVER_ERROR,
-          'No private key provided to sign the transaction. Please update using PATCH /user/me',
-        ),
-      );
-    }
-
-    const walletPrivateKey = userWallet?.privateKey;
-
-    const wallet = new ethers.Wallet(walletPrivateKey);
-    const signer = wallet.connect(this.provider);
-
-    const contract = new ethers.Contract(
-      process.env.AUCTION_CONTRACT_ADDRESS,
-      c.abi,
-      signer,
-    );
-
-    const highestBid = await this.contract.highestBid();
-
-    if (bidInfo.amount <= highestBid) {
-      throw new BadRequestException(
-        toErrorMessage(
-          ImErrorCodes.BAD_REQUEST,
-          'Bid amount is less than the current highest bid, Provide a higher value',
-        ),
-      );
-    }
-
-    try {
-      const transactionInfo = await contract.bid.send({
-        value: bidInfo.amount,
-      });
-
-      return { status: 'Bid Placed', transactionInfo };
-    } catch (e) {
-      throw new InternalServerErrorException(
-        toErrorMessage(ImErrorCodes.BAD_REQUEST, 'Error while placing bid'),
-      );
-    }
+    return new BidResponseDto();
+    // const userWallet = await this.userModel.findOne({
+    //   where: {
+    //     id: user?.id,
+    //   },
+    //   attributes: ['privateKey'],
+    // });
+    // if (!userWallet.privateKey) {
+    //   throw new InternalServerErrorException(
+    //     toErrorMessage(
+    //       ImErrorCodes.INTERNAL_SERVER_ERROR,
+    //       'No private key provided to sign the transaction. Please update using PATCH /user/me',
+    //     ),
+    //   );
+    // }
+    // const walletPrivateKey = userWallet?.privateKey;
+    // const wallet = new ethers.Wallet(walletPrivateKey);
+    // const signer = wallet.connect(this.provider);
+    // const contract = new ethers.Contract(
+    //   process.env.AUCTION_CONTRACT_ADDRESS,
+    //   c.abi,
+    //   signer,
+    // );
+    // const highestBid = await this.contract.highestBid();
+    // if (bidInfo.amount <= highestBid) {
+    //   throw new BadRequestException(
+    //     toErrorMessage(
+    //       ImErrorCodes.BAD_REQUEST,
+    //       'Bid amount is less than the current highest bid, Provide a higher value',
+    //     ),
+    //   );
+    // }
+    // try {
+    //   const transactionInfo = await contract.bid.send({
+    //     value: bidInfo.amount,
+    //   });
+    //   return { status: 'Bid Placed', transactionInfo };
+    // } catch (e) {
+    //   throw new InternalServerErrorException(
+    //     toErrorMessage(ImErrorCodes.BAD_REQUEST, 'Error while placing bid'),
+    //   );
+    // }
   }
 
   async getBalance() {

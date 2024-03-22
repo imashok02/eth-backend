@@ -4,6 +4,7 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AuctionService } from './auction.service';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import {
+  AuctionBalanceDto,
   AuctionBeneficiary,
   AuctionEndTimeDto,
   AuctionHighestBid,
@@ -57,6 +58,7 @@ export class AuctionController {
   }
 
   @Get('status')
+  @UseGuards(JwtAuthGuard)
   @ApiOkResponse({
     description: 'To know the status of the auction',
     type: AuctionStatusDto,
@@ -65,12 +67,27 @@ export class AuctionController {
     return this.auctionService.auctionStatus();
   }
 
+  @Get('balance')
+  @UseGuards(JwtAuthGuard)
+  @ApiOkResponse({
+    description: 'To know the available balance of the contract',
+    type: AuctionBalanceDto,
+  })
+  async auctionBalance(): Promise<AuctionBalanceDto> {
+    return this.auctionService.auctionBalance();
+  }
+
   @Get('stats')
+  @ApiOkResponse({
+    description: 'To know the stats of the auction',
+    type: AuctionStatsDto,
+  })
   async auctionStats(): Promise<AuctionStatsDto> {
     return this.auctionService.auctionStats();
   }
 
   @Get('history')
+  @UseGuards(JwtAuthGuard)
   async auctionHistory(@Query() paginationDto: PaginationDto) {
     return this.auctionService.auctionHistory(paginationDto);
   }

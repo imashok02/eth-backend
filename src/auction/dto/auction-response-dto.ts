@@ -4,6 +4,9 @@ import { IsNotEmpty, IsNumber } from 'class-validator';
 
 class AuctionStatusDto {
   @ApiProperty()
+  contractAddress: string;
+
+  @ApiProperty()
   beneficiary: string;
 
   @ApiProperty()
@@ -25,6 +28,11 @@ class AuctionStatsDto {
 
   @ApiProperty()
   totalEthVolume: string;
+}
+
+class AuctionBalanceDto {
+  @ApiProperty()
+  availableBalance: string;
 }
 
 class AuctionEndTimeDto {
@@ -76,4 +84,5 @@ export {
   AuctionBeneficiary,
   BidDto,
   BidResponseDto,
+  AuctionBalanceDto,
 };

@@ -7,8 +7,7 @@ import { InjectModel } from '@nestjs/sequelize';
 
 import { User } from './models/user.model';
 import { ImErrorCodes, toErrorMessage } from 'src/common/error';
-import { RegisterDto } from 'auth/dto/verify-login-creds-dtos';
-import * as bcrypt from 'bcrypt';
+import { RegisterDto } from 'src/auth/dto/verify-login-creds-dtos';
 import { UpdateUserDto } from './dto/user-profile.dto';
 
 @Injectable()
@@ -19,23 +18,19 @@ export class UserService {
     userExists: User,
     registerDto: RegisterDto,
   ): Promise<{ user: User }> {
-    if (userExists) {
-      // userExists = updateUser[1][0];
-    } else {
-      const hashedPassword = await bcrypt.hash(registerDto.password, 10);
-
+    if (!userExists) {
       userExists = await this.userModel.create({
-        name: registerDto.name,
-        email: registerDto.email,
-        password: hashedPassword,
         address: registerDto.address,
-        privateKey: registerDto.privateKey,
       });
 
       await userExists.save();
     }
 
     return { user: userExists };
+  }
+
+  public async getByAddress(address: string): Promise<User> {
+    return this.userModel.findOne({ where: { address } });
   }
 
   public async getById(id: number): Promise<User> {
@@ -77,6 +72,20 @@ export class UserService {
       throw new InternalServerErrorException(
         toErrorMessage(ImErrorCodes.INTERNAL_SERVER_ERROR, "You're not user"),
       );
+
+    return findUser;
+  }
+
+  public async findUserByAddress(address: string): Promise<User> {
+    if (!address)
+      throw new BadRequestException(
+        toErrorMessage(ImErrorCodes.BAD_REQUEST, ' No address provided'),
+      );
+    const findUser: User = await this.userModel.findOne({
+      where: {
+        address,
+      },
+    });
 
     return findUser;
   }

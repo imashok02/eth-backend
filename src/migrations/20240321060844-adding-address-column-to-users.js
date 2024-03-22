@@ -1,36 +1,31 @@
 module.exports = {
-  up: (queryInterface, Sequelize) => {
-    return queryInterface.sequelize.transaction((t) => {
-      return Promise.all([
-        queryInterface.addColumn(
-          'users',
-          'address',
-          {
-            type: Sequelize.DataTypes.STRING,
-          },
-          { transaction: t },
-        ),
-        queryInterface.addColumn(
-          'users',
-          'private_key',
-          {
-            type: Sequelize.DataTypes.STRING,
-          },
-          { transaction: t },
-        ),
-      ]);
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.addColumn('users', 'address', {
+      type: Sequelize.DataTypes.STRING,
     });
+    await queryInterface.sequelize.query(
+      'ALTER TABLE users ALTER COLUMN name DROP NOT NULL;',
+    );
+    await queryInterface.sequelize.query(
+      'ALTER TABLE users ALTER COLUMN email DROP NOT NULL;',
+    );
+    await queryInterface.sequelize.query(
+      'ALTER TABLE users DROP COLUMN password;',
+    );
+    await queryInterface.sequelize.query(
+      'ALTER TABLE users ADD CONSTRAINT constraint_name UNIQUE (address);',
+    );
   },
-  down: (queryInterface) => {
-    return queryInterface.sequelize.transaction((t) => {
-      return Promise.all([
-        queryInterface.removeColumn('users', 'address', {
-          transaction: t,
-        }),
-        queryInterface.removeColumn('users', 'private_key', {
-          transaction: t,
-        }),
-      ]);
+  down: async (queryInterface) => {
+    await queryInterface.removeColumn('users', 'address');
+    await queryInterface.sequelize.query(
+      'ALTER TABLE users ALTER COLUMN name SET NOT NULL;',
+    );
+    await queryInterface.sequelize.query(
+      'ALTER TABLE users ALTER COLUMN email SET NOT NULL;',
+    );
+    await queryInterface.addColumn('users', 'password', {
+      type: Sequelize.DataTypes.STRING,
     });
   },
 };
