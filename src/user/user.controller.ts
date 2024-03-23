@@ -15,17 +15,9 @@ export class UserController {
   @Get('me')
   @UseGuards(JwtAuthGuard)
   @ApiOkResponse({ type: UserProfileDto })
-  async getMe(): Promise<UserProfileDto> {
-    // const userData = await this.userService.getProfile(user);
-    // if (userData.email === null && userData.name === null) {
-    //   throw new UnauthorizedException('Please enter your details.');
-    // }
-
-    return {
-      id: 1,
-      name: 'ss',
-      email: 'asdsad',
-    };
+  async getMe(@CurrentUser() user: User): Promise<User> {
+    const userData = await this.userService.findUserByAddress(user.address);
+    return userData;
   }
 
   @Patch('me')
