@@ -33,26 +33,31 @@ export class AuctionController {
   }
 
   @Get('beneficiary')
+  @UseGuards(JwtAuthGuard)
   async auction(): Promise<AuctionBeneficiary> {
     return this.auctionService.getBeneficiary();
   }
 
   @Get('interface')
+  @UseGuards(JwtAuthGuard)
   async getAuctionInterface() {
     return this.auctionService.getAuctionInterface();
   }
 
   @Get('highest-bid')
+  @UseGuards(JwtAuthGuard)
   async getHighestBid(): Promise<AuctionHighestBid> {
     return this.auctionService.getHighestBid();
   }
 
   @Get('highest-bidder')
+  @UseGuards(JwtAuthGuard)
   async getHighestBidder(): Promise<AuctionHighestBidder> {
     return this.auctionService.getHighestBidder();
   }
 
   @Get('end-time')
+  @UseGuards(JwtAuthGuard)
   async getAuctionEndTime(): Promise<AuctionEndTimeDto> {
     return this.auctionService.getAuctionEndTime();
   }
@@ -78,6 +83,7 @@ export class AuctionController {
   }
 
   @Get('stats')
+  @UseGuards(JwtAuthGuard)
   @ApiOkResponse({
     description: 'To know the stats of the auction',
     type: AuctionStatsDto,
@@ -99,6 +105,7 @@ export class AuctionController {
   }
 
   @Get('balance')
+  @UseGuards(JwtAuthGuard)
   async getBalance() {
     return this.auctionService.getBalance();
   }

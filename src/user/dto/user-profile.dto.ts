@@ -7,10 +7,7 @@ class UserProfileDto {
   id: number;
 
   @ApiProperty()
-  name: string;
-
-  @ApiProperty()
-  email: string;
+  address: string;
 }
 
 class UpdateUserDto {
@@ -30,8 +27,7 @@ class UpdateUserDto {
 const toUserProfileDto = (user: User): UserProfileDto => {
   return {
     id: user.id,
-    name: user.name,
-    email: user.email,
+    address: user.address,
   };
 };
 
