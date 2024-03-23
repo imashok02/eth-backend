@@ -27,7 +27,7 @@ unzip secrets_example folder
 
 ```bash
 1. When running the app using docker compose, DO NOT change DB_HOST in config/database.json, since app runs via docker needs it to be postgres.
-2. Also DO NOT change the value of host in test object in config/database.json, 
+2. Also DO NOT change the value of host in production object in config/database.json, 
 
 ```
 
