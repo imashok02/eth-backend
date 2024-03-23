@@ -1,0 +1,19 @@
+{
+	"development": {
+		"username": "ashok",
+		"password": "secret",
+		"database": "eth",
+		"host": "localhost",
+		"dialect": "postgres",
+		"port": 5432
+	},
+	"production": {
+		"username": "ashok",
+		"password": "secret",
+		"database": "eth",
+		"host": "postgres",
+		"dialect": "postgres",
+		"port": 5432
+	}
+	
+}
