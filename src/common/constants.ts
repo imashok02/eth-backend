@@ -1,5 +1,5 @@
 const ENVIRONMENT = {
-  DEV: 'dev',
+  DEV: 'development',
   TEST: 'test',
   PROD: 'production',
 };

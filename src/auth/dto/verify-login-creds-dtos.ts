@@ -2,29 +2,36 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsEmail } from 'class-validator';
 
 import { User } from 'src/user/models/user.model';
-
 class LoginDto {
   @ApiProperty()
   @IsNotEmpty()
-  email: string;
+  signedMessage: string;
 
   @ApiProperty()
   @IsNotEmpty()
-  password: string;
+  message: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  address: string;
 }
 
 class RegisterDto {
   @ApiProperty()
   @IsEmail()
-  email: string;
+  email?: string;
 
   @ApiProperty()
   @IsNotEmpty()
-  name: string;
+  name?: string;
 
   @ApiProperty()
   @IsNotEmpty()
-  password: string;
+  password?: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  address: string;
 }
 
 class VerifyLoginCredsResponseDto {
@@ -38,7 +45,7 @@ class VerifyLoginCredsResponseDto {
   isSignUp: boolean;
 
   constructor(user: User) {
-    this.user = user.toJSON();
+    this.user = user;
   }
 
   setAuthToken(authToken: string): VerifyLoginCredsResponseDto {

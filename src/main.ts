@@ -22,7 +22,17 @@ function initializeSwagger(app: NestExpressApplication): void {
     customCss: cssTheme,
   });
 }
-// }
+
+function enableCors(
+  app: NestExpressApplication,
+  config: ConfigService<unknown, boolean>,
+): void {
+  app.enableCors({
+    origin: config.get<string>('ORIGIN'),
+    // methods: "GET,PUT,PATCH,POST",
+    credentials: config.get<boolean>('CREDENTIALS'),
+  });
+}
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -32,6 +42,7 @@ async function bootstrap() {
   const config = app.get(ConfigService);
 
   initializeSwagger(app);
+  enableCors(app, config);
 
   app.use(express.json({ limit: '10mb' }));
 

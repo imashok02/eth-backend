@@ -9,6 +9,6 @@ export class User extends BaseModel<User> {
   @Column({ type: DataType.STRING, allowNull: true })
   email: string;
 
-  @Column({ type: DataType.STRING, allowNull: true })
-  password: string;
+  @Column({ type: DataType.STRING, allowNull: false, unique: true })
+  address: string;
 }
