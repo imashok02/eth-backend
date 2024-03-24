@@ -70,10 +70,9 @@ export class AuctionService {
   }
 
   private async makeBidEntry(bidder: string, bidAmount: string): Promise<void> {
-    log('incoming ==> ', bidder, bidAmount);
     try {
       await this.bidModel.create({
-        contract_address: process.env.AUCTION_CONTRACT_ADDRESS,
+        contractAddress: process.env.AUCTION_CONTRACT_ADDRESS,
         address: bidder,
         bidAmount: bidAmount,
       });
@@ -123,7 +122,11 @@ export class AuctionService {
       process.env.AUCTION_CONTRACT_ADDRESS,
     );
 
-    const bidCount = await this.bidModel.count();
+    const bidCount = await this.bidModel.count({
+      where: {
+        contractAddress: process.env.AUCTION_CONTRACT_ADDRESS,
+      },
+    });
 
     return {
       totalBids: bidCount?.toString(),

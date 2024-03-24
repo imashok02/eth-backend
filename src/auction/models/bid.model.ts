@@ -9,10 +9,10 @@ import { BaseModel } from 'src/database/base.model';
 })
 export class Bid extends BaseModel<Bid> {
   @Column({ type: DataType.STRING, allowNull: false })
-  contract_address: string;
+  contractAddress: string;
 
   @Column({ type: DataType.INTEGER, allowNull: true })
-  user_id: number;
+  userId: number;
 
   @Column({ type: DataType.STRING, allowNull: false })
   address: string;

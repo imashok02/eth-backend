@@ -16,7 +16,7 @@ import {
 } from './dto/verify-login-creds-dtos';
 
 @ApiTags('auth')
-@Controller(['auth'])
+@Controller(['v1/auth'])
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

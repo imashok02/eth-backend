@@ -18,7 +18,7 @@ import { User } from 'src/user/models/user.model';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @ApiTags('Auction')
-@Controller('auction')
+@Controller('v1/auction')
 export class AuctionController {
   constructor(private readonly auctionService: AuctionService) {}
 

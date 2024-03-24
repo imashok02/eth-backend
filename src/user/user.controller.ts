@@ -8,7 +8,7 @@ import { CurrentUser } from 'src/common/decorator/current-user.decorator';
 import { User } from './models/user.model';
 
 @ApiTags('User')
-@Controller('user')
+@Controller('v1/user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
