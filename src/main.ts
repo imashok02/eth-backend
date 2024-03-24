@@ -4,12 +4,46 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as express from 'express';
 
+import SwaggerAdapter from './common/adapters/swagger-adapter';
+import { readFileSync } from 'fs';
+import { SwaggerModule } from '@nestjs/swagger';
+
+function initializeSwagger(app: NestExpressApplication): void {
+  const swaggerAdapter = new SwaggerAdapter();
+  const cssTheme = readFileSync('./src/swaggerTheme.css', {
+    encoding: 'utf-8',
+  });
+  swaggerAdapter.init();
+  const document = SwaggerModule.createDocument(
+    app,
+    swaggerAdapter.swaggerConfig,
+  );
+  SwaggerModule.setup('docs', app, document, {
+    customCss: cssTheme,
+  });
+}
+
+function enableCors(
+  app: NestExpressApplication,
+  config: ConfigService<unknown, boolean>,
+): void {
+  app.enableCors({
+    origin: config.get<string>('ORIGIN'),
+    // methods: "GET,PUT,PATCH,POST",
+    credentials: config.get<boolean>('CREDENTIALS'),
+  });
+}
+
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bufferLogs: true,
   });
 
   const config = app.get(ConfigService);
+
+  initializeSwagger(app);
+  enableCors(app, config);
+
   app.use(express.json({ limit: '10mb' }));
 
   await app.listen(config.get<string>('PORT'), '0.0.0.0').then((server) => {
